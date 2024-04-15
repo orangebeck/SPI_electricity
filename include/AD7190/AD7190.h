@@ -134,6 +134,8 @@
 
 int AD7190_init_rdy_pin(int pin_num);
 
+int AD7190_init_cs_pin(int pin_num);
+
 void AD7190_wait_rdy_go_low(void);
 
 int AD7190_set_register_value(struct spi_device *spi_device, unsigned char register_addr, unsigned int register_value, unsigned char bytes_number);

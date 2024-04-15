@@ -39,14 +39,15 @@ static int electricity_open(struct inode *inode, struct file *file)
 {
     int temp;
     printk("electricity_open \n");
-    AD7190_init_rdy_pin( of_get_named_gpio(electricity_device_node, "spi_rdy_state", 0));
+    AD7190_init_rdy_pin(of_get_named_gpio(electricity_device_node, "spi_rdy_state", 0));
+    AD7190_init_cs_pin(of_get_named_gpio(of_get_parent(electricity_device_node), "cs-gpios", 0));
+    
 
     AD7190_init(electricity_device_spi);
     
     //单次进行数据转换
-    AD7190_set_power(electricity_device_spi,1);
-    //AD7190_range_setup(electricity_device_spi, 0, AD7190_CONF_GAIN_1);
-    AD7190_channel_select(electricity_device_spi, AD7190_CH_TEMP_SENSOR);
+    AD7190_channel_select(electricity_device_spi,AD7190_CONF_CHAN(AD7190_CH_TEMP_SENSOR));
+    AD7190_single_conversion(electricity_device_spi);
     temp = AD7190_single_conversion(electricity_device_spi);
     printk("the temp is %d\n",temp);
 

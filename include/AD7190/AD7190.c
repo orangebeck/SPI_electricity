@@ -3,6 +3,7 @@
 #include <linux/string.h>
 
 static int rdy_pin = -1;
+static int cs_pin = -1;
 
 int AD7190_init_rdy_pin(int pin_num){
     rdy_pin = pin_num;
@@ -11,19 +12,38 @@ int AD7190_init_rdy_pin(int pin_num){
     return rdy_pin;
 }
 
+int AD7190_init_cs_pin(int pin_num){
+    cs_pin = pin_num;
+    gpio_request(cs_pin,"cs");
+    gpio_direction_output(cs_pin,1);
+    return rdy_pin;
+}
+
 /***************************************************************************//**
- * @brief Waits for RDY pin to go low.
+ * @brief 等待rdy引脚变化，采用的是轮询形式进行，每次1ms
  *
  * @return none.
 *******************************************************************************/
 void AD7190_wait_rdy_go_low(void)
 {
   unsigned long timeOutCnt = 0xFFFFFFFF;
+	int count = 0;	//增加拉低计数，如果10ms以上就代表AD7190转换完成
 
-  while(gpio_get_value(rdy_pin) && timeOutCnt--)
+	gpio_direction_output(cs_pin,0);	//进入的时候将片选置0，等待rdy
+  while(timeOutCnt--)
   {
-      ;
+    mdelay(1);
+		if (gpio_get_value(rdy_pin) == 0)
+		{
+			count ++;
+			if (count >= 10)
+			{
+				break;
+			}
+		}
   }
+
+	gpio_direction_output(cs_pin,1);
   if (timeOutCnt != 0)
   {
     printk("rdy go low!\n");
