@@ -1,0 +1,37 @@
+{
+	"folders": [
+		{
+			"path": "."
+		}
+	],
+	"settings": {
+		"files.associations": {
+			"uaccess.h": "c",
+			"module.h": "c",
+			"ide.h": "c",
+			"bitops.h": "c",
+			"bio.h": "c",
+			"interrupt.h": "c",
+			"hardirq.h": "c",
+			"irqflags.h": "c",
+			"of_address.h": "c",
+			"map.h": "c",
+			"int-ll64.h": "c",
+			"device.h": "c",
+			"spi.h": "c",
+			"bitsperlong.h": "c",
+			"ad7190.h": "c",
+			"init.h": "c",
+			"kernel.h": "c",
+			"error-injection.h": "c",
+			"err.h": "c",
+			"errno.h": "c",
+			"errno-base.h": "c",
+			"string.h": "c",
+			"time.h": "c",
+			"delay.h": "c",
+			"gpio.h": "c",
+			"scatterlist.h": "c"
+		}
+	}
+}
