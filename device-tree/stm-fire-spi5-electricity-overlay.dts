@@ -26,7 +26,7 @@
 			spi_electricity@0 {
 				compatible = "fire,spi_electricity";
 				spi-max-frequency = <5000000>;		//最大为5MHz
-				spi_rdy_state = <&gpiof 8 GPIO>;
+				spi_rdy_state = <&gpiof 6 GPIO>;
 				reg = <0>;
 			};
 		};
