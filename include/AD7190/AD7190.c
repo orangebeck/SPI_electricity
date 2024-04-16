@@ -301,11 +301,68 @@ void AD7190_chop_setting(struct spi_device *spi_device, unsigned char chop)
     ret = AD7190_set_register_value(spi_device, AD7190_REG_CONF, new_reg_value, 3);
     if (ret < 0)
     {
-        printk("AD7190_channel_select error\n");
+        printk("AD7190_chop_setting error\n");
     }
 }
 
-/***************************************************************************/ /**
+/***************************************************************************/
+/**
+ * @brief 设置clk
+ *
+ * @param clk - clk setting
+ *
+ * @return none.
+ *******************************************************************************/
+void AD7190_clk_setting(struct spi_device *spi_device, unsigned char clk)
+{
+    int ret;
+    unsigned int old_reg_value = 0x0;
+    unsigned int new_reg_value = 0x0;
+
+    old_reg_value = AD7190_get_register_value(spi_device, AD7190_REG_MODE, 3);
+
+    new_reg_value = old_reg_value & (~(AD7190_MODE_CLKSRC(0x3)));
+    if (clk != 0)
+    {
+        new_reg_value = old_reg_value | AD7190_MODE_CLKSRC(clk);
+    }
+
+    ret = AD7190_set_register_value(spi_device, AD7190_REG_MODE, new_reg_value, 3);
+    if (ret < 0)
+    {
+        printk("AD7190_clk_setting error\n");
+    }
+}
+
+/***************************************************************************/
+/**
+ * @brief 设置滤波器输出速率
+ *
+ * @param freq - freq setting
+ *
+ * @return none.
+ *******************************************************************************/
+void AD7190_filter_freq_setting(struct spi_device *spi_device, unsigned char freq)
+{
+    int ret;
+    unsigned int old_reg_value = 0x0;
+    unsigned int new_reg_value = 0x0;
+
+    old_reg_value = AD7190_get_register_value(spi_device, AD7190_REG_MODE, 3);
+
+    new_reg_value = old_reg_value & (~AD7190_MODE_RATE(0x3FF));
+    
+    new_reg_value = old_reg_value | AD7190_MODE_RATE(freq);
+
+    ret = AD7190_set_register_value(spi_device, AD7190_REG_MODE, new_reg_value, 3);
+    if (ret < 0)
+    {
+        printk("AD7190_clk_setting error\n");
+    }
+}
+
+/***************************************************************************/ 
+/**
   * @brief 选择转机极性及ADC输入范围
   *
   * @param polarity - Polarity select bit.
@@ -333,20 +390,13 @@ void AD7190_range_setup(struct spi_device *spi_device, unsigned char polarity, u
  *
  * @return regData - Result of a single analog-to-digital conversion.
  *******************************************************************************/
-unsigned int AD7190_single_conversion(struct spi_device *spi_device)
+void AD7190_single_conversion(struct spi_device *spi_device)
 {
     unsigned int command = 0x0;
     unsigned int regData = 0x0;
 
     command = AD7190_MODE_SEL(AD7190_MODE_SINGLE) | AD7190_MODE_CLKSRC(AD7190_CLK_EXT_MCLK1_2) | AD7190_MODE_RATE(0x060);
     AD7190_set_register_value(spi_device, AD7190_REG_MODE, command, 3);
-
-    AD7190_wait_rdy_go_low();
-
-    regData = AD7190_get_register_value(spi_device, AD7190_REG_DATA, 3);
-    printk("single conversion = %d\n",regData);
-
-    return regData;
 }
                                                             
 /***************************************************************************/

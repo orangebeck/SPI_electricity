@@ -55,18 +55,57 @@ static int electricity_open(struct inode *inode, struct file *file)
 }
 static ssize_t electricity_read(struct file *file, char __user *buf, size_t cnt, loff_t *loff)
 {
+    int ret;
+    struct AD7190 *AD7190;
+    AD7190 = (struct AD7190 *) kzalloc (cnt,GFP_KERNEL);
+
     printk("electricity_read \n");
+
+    AD7190_wait_rdy_go_low();
+
+    AD7190->data = AD7190_get_register_value(electricity_device_spi, AD7190_REG_DATA, 3);
+    
+    ret = copy_to_user(buf, AD7190, sizeof(struct AD7190));
+
+    kfree(AD7190);
+
     return 0;
 }
 static ssize_t electricity_write(struct file *file, const char __user *buf, size_t cnt, loff_t *loff)
 {
+    int ret;
+    struct AD7190 *AD7190;
+
     printk("electricity_write \n");
+
+    AD7190 = (struct AD7190 *) kzalloc (cnt,GFP_KERNEL);
+    ret = copy_from_user(AD7190, buf,cnt);
+
+    AD7190_clk_setting(electricity_device_spi,AD7190->clk);
+    AD7190_filter_freq_setting(electricity_device_spi,AD7190->frequency);
+    AD7190_range_setup(electricity_device_spi,0,AD7190->gain);
+
+    AD7190_chop_setting(electricity_device_spi,1);
+
+    AD7190_calibrate(electricity_device_spi,AD7190_MODE_CAL_INT_ZERO,AD7190->channel);
+    AD7190_calibrate(electricity_device_spi,AD7190_MODE_CAL_INT_FULL,AD7190->channel);
+
+    if (AD7190->continuous == 1)
+    {
+        AD7190_continuous_readdata(electricity_device_spi,1);
+    }else
+    {
+        AD7190_single_conversion(electricity_device_spi);
+    }
+
+    kfree(AD7190);
 
     return 0;
 }
 static int electricity_release(struct inode *inode, struct file *file)
 {
-    gpio_free(86);
+    gpio_free(of_get_named_gpio(electricity_device_node, "spi_rdy_state", 0));
+    gpio_free(of_get_named_gpio(of_get_parent(electricity_device_node), "cs-gpios", 0));
     return 0;
 }
 

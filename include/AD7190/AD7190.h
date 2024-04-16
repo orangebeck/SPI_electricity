@@ -10,6 +10,17 @@
 #include <linux/delay.h>
 #include <linux/gpio.h>
 
+struct AD7190 {
+    unsigned char channel;    //转换通道
+    unsigned char continuous;
+    unsigned char mode;   //模式选择
+    unsigned char clk;
+    unsigned char frequency;  //滤波器输出速率
+    unsigned char chop;
+    unsigned char gain;
+    int data;
+};
+
 #define AD7190_DOUT_TIMEOUT 0xFFFFF     //  TODO: This is arbitrary. Copied from Analog Devices generic driver.
 
 #define AD7190_CS_CHANGE    1
@@ -156,15 +167,17 @@ void AD7190_calibrate(struct spi_device *spi_device, unsigned char mode, unsigne
 
 void AD7190_chop_setting(struct spi_device *spi_device, unsigned char chop);
 
+void AD7190_clk_setting(struct spi_device *spi_device, unsigned char clk);
+
+void AD7190_filter_freq_setting(struct spi_device *spi_device, unsigned char freq);
+
 void AD7190_range_setup(struct spi_device *spi_device, unsigned char polarity, unsigned char range);
 
-unsigned int AD7190_single_conversion(struct spi_device *spi_device);
+void AD7190_single_conversion(struct spi_device *spi_device);
 
 void AD7190_continuous_readdata(struct spi_device *spi_device, unsigned char cread);
 
 unsigned int AD7190_continuous_read_average(struct spi_device *spi_device, unsigned char sampleNumber);
 
 unsigned int AD7190_temperature_read(struct spi_device *spi_device);
-
-void ad7190_unipolar_multichannel_conf(struct spi_device *spi_device);
 #endif
