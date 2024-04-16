@@ -13,12 +13,11 @@
 struct AD7190 {
     unsigned char channel;    //转换通道
     unsigned char continuous;
-    unsigned char mode;   //模式选择
     unsigned char clk;
     unsigned char frequency;  //滤波器输出速率
     unsigned char chop;
     unsigned char gain;
-    int data;
+    unsigned int data;
 };
 
 #define AD7190_DOUT_TIMEOUT 0xFFFFF     //  TODO: This is arbitrary. Copied from Analog Devices generic driver.
